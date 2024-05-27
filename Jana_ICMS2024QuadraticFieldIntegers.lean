@@ -1,1 +1,3 @@
-#check {K : Type*}[Field K][Algebra Q K](h : findim Q K = 2)
+import Mathlib.NumberTheory.NumberField.Basic
+
+theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : findim ℚ K = 2) : ∃ (α : K), K ≅ Q⟮α⟯
