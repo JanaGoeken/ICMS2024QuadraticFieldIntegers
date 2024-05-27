@@ -12,3 +12,7 @@ theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finran
   let φ := (IntermediateField.topEquiv (F := ℚ) (E := K)).symm
   rw [hα]
   apply φ.toRingEquiv
+
+theorem MinpolyDegreeAtMostTwo {K : Type*} [Field K] [Algebra K ℚ] (q : ℚ) [FiniteDimensional K ℚ] :
+  (minpoly K q).degree ≤ ↑(FiniteDimensional.finrank K ℚ)  := by
+  exact minpoly.degree_le q
