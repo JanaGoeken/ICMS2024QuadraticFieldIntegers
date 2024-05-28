@@ -1,5 +1,6 @@
 import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.FieldTheory.PrimitiveElement
+import Mathlib.Data.Real.Basic
 
 open FiniteDimensional Polynomial IntermediateField
 
@@ -13,6 +14,10 @@ theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finran
   rw [hα]
   apply φ.toRingEquiv
 
-theorem MinpolyDegreeAtMostTwo {K : Type*} [Field K] [Algebra K ℚ] (q : ℚ) [FiniteDimensional K ℚ] :
-  (minpoly K q).degree ≤ ↑(FiniteDimensional.finrank K ℚ)  := by
-  exact minpoly.degree_le q
+#check (2 : ℝ)
+theorem MinpolyDegreeAtMostTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K) (h : finrank ℚ K = 2)
+[FiniteDimensional ℚ K] : (minpoly ℚ α ).degree ≤ 2 := by
+  convert minpoly.degree_le α
+  · rw [h]
+    norm_cast
+  · assumption
