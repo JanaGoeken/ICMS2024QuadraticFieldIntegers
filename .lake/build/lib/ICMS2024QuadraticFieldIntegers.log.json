@@ -1,0 +1,7 @@
+[{"message":
+  ".> LEAN_PATH=.\\.\\.lake/packages\\batteries\\.lake\\build\\lib;.\\.\\.lake/packages\\Qq\\.lake\\build\\lib;.\\.\\.lake/packages\\aesop\\.lake\\build\\lib;.\\.\\.lake/packages\\proofwidgets\\.lake\\build\\lib;.\\.\\.lake/packages\\Cli\\.lake\\build\\lib;.\\.\\.lake/packages\\importGraph\\.lake\\build\\lib;.\\.\\.lake/packages\\mathlib\\.lake\\build\\lib;.\\.\\.lake\\build\\lib PATH c:\\Users\\frank\\.elan\\toolchains\\leanprover--lean4---v4.8.0-rc2\\bin\\lean.exe .\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean -R .\\.\\.\\. -o .\\.\\.lake\\build\\lib\\ICMS2024QuadraticFieldIntegers.olean -i .\\.\\.lake\\build\\lib\\ICMS2024QuadraticFieldIntegers.ilean -c .\\.\\.lake\\build\\ir\\ICMS2024QuadraticFieldIntegers.c --json",
+  "level": "trace"},
+ {"message":
+  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:1:13: function expected at\n  \"world\"\nterm has type\n  String",
+  "level": "error"},
+ {"message": "Lean exited with code 1", "level": "error"}]
