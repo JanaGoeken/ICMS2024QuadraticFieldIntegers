@@ -206,7 +206,20 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
   by_cases hk : (k : K) = 0
   · sorry
   refine ⟨d, ?_, d_sqfree⟩
-  have hd1 : d ≠ 1 := sorry
+  have hd1 : d ≠ 1 := by
+    intro hd_cont
+    rw [hd_cont] at s_eq
+    rw [s_eq] at r_sq_eq_s
+    simp at r_sq_eq_s
+    rw [sq_eq_sq_iff_eq_or_eq_neg] at r_sq_eq_s
+    have h_iso_q : (ℚ⟮α⟯ = ⊥) := by
+      rw [IntermediateField.adjoin_simple_eq_bot_iff]
+      obtain (hroot | hroot) := r_sq_eq_s
+      · rw [hroot] at α_eq
+        rw [α_eq]
+        sorry
+      · sorry
+    sorry
   refine φ.trans ?_
   subst α_eq
   have : ℚ⟮p + q * r⟯ = ℚ⟮r / k⟯ := by
@@ -222,6 +235,21 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
   rw [this]
   let pb : PowerBasis ℚ ℚ⟮r / k⟯ := IntermediateField.adjoin.powerBasis (Algebra.IsIntegral.isIntegral _)
   have pb_gen : pb.gen = r / k := by unfold_let pb; simp
+
+  have hgen_irr : r/k ∉ (algebraMap ℚ K).range := by
+    intro h_irr
+    have h_bot : (ℚ⟮r/k⟯ = ⊥) := by
+      rw [IntermediateField.adjoin_simple_eq_bot_iff]
+      rw [IntermediateField.mem_bot]
+      exact h_irr
+    have h_dim : FiniteDimensional.finrank ℚ ℚ⟮r/k⟯ = 1 := by
+      rw [h_bot]
+      exact IntermediateField.finrank_bot
+    have h_iso_new : ℚ⟮r/k⟯ ≃+* K := by sorry
+
+
+    sorry
+
   have minpoly_pb : minpoly ℚ pb.gen = X^2 - C (d : ℚ) := by
     rw [← minpoly.algebraMap_eq (B' := K), IntermediateField.algebraMap_apply, pb_gen]
     refine (minpoly.unique _ _ ?_ ?_ ?_).symm
