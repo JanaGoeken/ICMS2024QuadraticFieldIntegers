@@ -197,39 +197,35 @@ attribute [-instance] algebraRat
 lemma not_mem_range_algebraMap_of_finrank {K : Type*} [Field K] [Algebra ℚ K] (α : K)
     (h : 1 < FiniteDimensional.finrank ℚ (ℚ⟮α⟯ : Type _)) :
     α ∉ (algebraMap ℚ K).range := by
-  sorry
+  intro hα
+  rw [IntermediateField.adjoin_simple_eq_bot_iff.mpr] at h
+  · simp only [bot_toSubalgebra, IntermediateField.finrank_bot, lt_self_iff_false] at h
+  simpa [IntermediateField.mem_bot] using hα
 
 theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h : FiniteDimensional.finrank ℚ K = 2) :
-    ∃ (d : ℤ) (φ : K ≃+* AdjoinRoot (X^2 - C (d : ℚ))), Squarefree d := by
+    ∃ (d : ℤ) (_φ : K ≃+* AdjoinRoot (X^2 - C (d : ℚ))), Squarefree d := by
   have : FiniteDimensional ℚ K := Module.finite_of_finrank_eq_succ h
   have : CharZero K := algebraRat.charZero K
   obtain ⟨α, φ, _⟩ := PrimitiveElementsOfDImTwo h
   let φ' : K ≃ₗ[ℚ] ℚ⟮α⟯ := AlgEquiv.toLinearEquiv (AlgEquiv.ofRingEquiv (f := φ) (by simp))
-  obtain ⟨p, q, s, r, α_eq, r_sq_eq_s, hq0⟩ := by
-    refine Ednawashere3 h α (not_mem_range_algebraMap_of_finrank _ ?_)
+  have hα : α ∉ (algebraMap ℚ K).range := by
+    refine (not_mem_range_algebraMap_of_finrank _ ?_)
     rw [← φ'.finrank_eq, h]
     norm_num
+  obtain ⟨p, q, s, r, rfl, r_sq_eq_s, hq0⟩ := by
+    refine Ednawashere3 h α hα
   have hq : (q : K) ≠ 0 := by norm_cast
   obtain ⟨k, d, s_eq, d_sqfree⟩ := SquarefreePartFactorizationRat s
   by_cases hk : (k : K) = 0
-  · sorry
+  · have hk : k = 0 := by exact_mod_cast hk
+    subst hk
+    simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at s_eq
+    subst s_eq
+    simp only [Rat.cast_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff] at r_sq_eq_s
+    subst r_sq_eq_s
+    simp at hα
   refine ⟨d, ?_, d_sqfree⟩
-  have hd1 : d ≠ 1 := by
-    intro hd_cont
-    rw [hd_cont] at s_eq
-    rw [s_eq] at r_sq_eq_s
-    simp at r_sq_eq_s
-    rw [sq_eq_sq_iff_eq_or_eq_neg] at r_sq_eq_s
-    have h_iso_q : (ℚ⟮α⟯ = ⊥) := by
-      rw [IntermediateField.adjoin_simple_eq_bot_iff]
-      obtain (hroot | hroot) := r_sq_eq_s
-      · rw [hroot] at α_eq
-        rw [α_eq]
-        sorry
-      · sorry
-    sorry
   refine φ.trans ?_
-  subst α_eq
   have : ℚ⟮p + q * r⟯ = ℚ⟮r / k⟯ := by
     apply le_antisymm <;> rw [adjoin_le_iff, Set.le_iff_subset, Set.singleton_subset_iff]
     · have : r = r / k * k := by field_simp
@@ -243,21 +239,6 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
   rw [this]
   let pb : PowerBasis ℚ ℚ⟮r / k⟯ := IntermediateField.adjoin.powerBasis (Algebra.IsIntegral.isIntegral _)
   have pb_gen : pb.gen = r / k := by unfold_let pb; simp
-
-  have hgen_irr : r/k ∉ (algebraMap ℚ K).range := by
-    intro h_irr
-    have h_bot : (ℚ⟮r/k⟯ = ⊥) := by
-      rw [IntermediateField.adjoin_simple_eq_bot_iff]
-      rw [IntermediateField.mem_bot]
-      exact h_irr
-    have h_dim : FiniteDimensional.finrank ℚ ℚ⟮r/k⟯ = 1 := by
-      rw [h_bot]
-      exact IntermediateField.finrank_bot
-    have h_iso_new : ℚ⟮r/k⟯ ≃+* K := by sorry
-
-
-    sorry
-
   have minpoly_pb : minpoly ℚ pb.gen = X^2 - C (d : ℚ) := by
     rw [← minpoly.algebraMap_eq (B' := K), IntermediateField.algebraMap_apply, pb_gen]
     refine (minpoly.unique _ _ ?_ ?_ ?_).symm
@@ -287,3 +268,5 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
     rw [r_sq_eq_s, s_eq]
     push_cast
     exact sub_self _
+
+#print axioms isombetweenthethinkswewanthehe

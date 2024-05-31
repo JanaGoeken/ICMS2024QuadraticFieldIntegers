@@ -91,27 +91,30 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
       simp at minpoly_eq
       apply minpoly.ne_zero (A := ℚ) (x := α) _ minpoly_eq
       exact Algebra.IsIntegral.isIntegral α
-    · rw[ha] at proofabc r_def
-      simp at proofabc r_def
-      set p := 0 with p_def
-      set q := - c / (b ^ 2) with q_def
-      have h_q : q ≠ 0 := by
-        intro hq
-        rw[hq] at q_def
-        rw[eq_comm, _root_.div_eq_zero_iff] at q_def
-        obtain (hc | hb) := q_def
-        · sorry
-        · sorry
-      use p, q, s, r
-      constructor
-      · rw[p_def, q_def, r_def]
-        push_cast
-        simp only [zero_add]
-        field_simp
-        linear_combination ↑b * proofabc
-      · constructor
-        · exact h_rs
-        · assumption
+    have hb' : b ≠ 0 := by exact_mod_cast hb
+    rw[ha] at proofabc r_def
+    simp at proofabc r_def
+    set p := 0 with p_def
+    set q := - c / (b ^ 2) with q_def
+    have h_q : q ≠ 0 := by
+      intro hq
+      rw[hq] at q_def
+      rw[eq_comm, _root_.div_eq_zero_iff] at q_def
+      obtain (hc | hb) := q_def
+      · rw [neg_eq_zero] at hc
+        simp only [hc, Rat.cast_zero, add_zero, mul_eq_zero, Rat.cast_eq_zero, hb', false_or] at proofabc
+        simp only [proofabc, RingHom.mem_range, eq_ratCast, Rat.cast_eq_zero, exists_eq, not_true_eq_false] at h_2
+      · simp [hb'] at hb
+    use p, q, s, r
+    constructor
+    · rw[p_def, q_def, r_def]
+      push_cast
+      simp only [zero_add]
+      field_simp
+      linear_combination ↑b * proofabc
+    · constructor
+      · exact h_rs
+      · assumption
   · have h_roots : α = (-b + r) / (2 * a) ∨ α = (-b -r) / (2 * a) := by
       apply (quadratic_eq_zero_iff _ _ α).1
       · convert proofabc using 3
