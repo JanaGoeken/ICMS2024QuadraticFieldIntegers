@@ -1,4 +1,5 @@
-import Mathlib
+-- import Mathlib
+import ICMS2024QuadraticFieldIntegers.Jana
 
 theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n = k^2*l ∧ Squarefree l := by
   by_cases h : n = 0
@@ -188,3 +189,57 @@ theorem SquarefreePartFactorizationRat (q : ℚ) : ∃ k : ℚ, ∃ l : ℤ, q =
         exact_mod_cast h_nat.2
 
 #print axioms SquarefreePartFactorizationRat
+
+open IntermediateField Polynomial
+
+attribute [-instance] algebraRat
+
+theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h : FiniteDimensional.finrank ℚ K = 2) :
+    ∃ (d : ℤ) (φ : K ≃+* AdjoinRoot (X^2 - C (d : ℚ))), Squarefree d := by
+  have : FiniteDimensional ℚ K := Module.finite_of_finrank_eq_succ h
+  have : CharZero K := algebraRat.charZero K
+  obtain ⟨α, φ, _⟩ := PrimitiveElementsOfDImTwo h
+  obtain ⟨p, q, s, r, α_eq, r_sq_eq_s⟩ := Ednawashere3 h α
+  by_cases hq : (q : K) = 0
+  · sorry
+  obtain ⟨k, d, s_eq, d_sqfree⟩ := SquarefreePartFactorizationRat s
+  by_cases hk : (k : K) = 0
+  · sorry
+  refine ⟨d, ?_, d_sqfree⟩
+  refine φ.trans ?_
+  subst α_eq
+  have : ℚ⟮p + q * r⟯ = ℚ⟮r / k⟯ := by
+    apply le_antisymm <;> rw [adjoin_le_iff, Set.le_iff_subset, Set.singleton_subset_iff]
+    · have : r = r / k * k := by field_simp
+      conv_lhs => rw [this]
+      refine add_mem ?_ (mul_mem ?_ (mul_mem (mem_adjoin_simple_self _ _) ?_)) <;>
+      · apply SubfieldClass.ratCast_mem
+    · have : r = ((p + q * r) - p) / q := by field_simp
+      conv_lhs => rw [this]
+      refine div_mem (div_mem (sub_mem (mem_adjoin_simple_self _ _) ?_) ?_) ?_ <;>
+      · apply SubfieldClass.ratCast_mem
+  rw [this]
+  let pb : PowerBasis ℚ ℚ⟮r / k⟯ := IntermediateField.adjoin.powerBasis (Algebra.IsIntegral.isIntegral _)
+  have pb_gen : pb.gen = r / k := by unfold_let pb; simp
+  have minpoly_pb : minpoly ℚ pb.gen = X^2 - C (d : ℚ) := by
+    rw [← minpoly.algebraMap_eq (B' := K), IntermediateField.algebraMap_apply, pb_gen]
+    refine (minpoly.unique _ _ ?_ ?_ ?_).symm
+    · apply Polynomial.monic_X_pow_sub_C
+      norm_num
+    · simp only [map_intCast, map_sub, map_pow, aeval_X, div_pow]
+      field_simp
+      rw [r_sq_eq_s, s_eq]
+      push_cast
+      exact sub_self _
+    · sorry
+    · exact NoZeroSMulDivisors.algebraMap_injective (ℚ⟮r / k⟯) K
+  refine (AdjoinRoot.equiv' (R := ℚ) _ pb ?_ ?_).symm.toRingEquiv
+  · rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero, minpoly_pb]
+  · suffices : aeval (algebraMap _ K pb.gen) (X ^ 2 - C (d : ℚ)) = 0
+    · simp only [IntermediateField.algebraMap_apply, map_intCast, map_sub, map_pow, aeval_X] at this ⊢
+      exact_mod_cast this
+    simp only [IntermediateField.algebraMap_apply, pb_gen, map_intCast, map_sub, map_pow, aeval_X, div_pow]
+    field_simp
+    rw [r_sq_eq_s, s_eq]
+    push_cast
+    exact sub_self _
