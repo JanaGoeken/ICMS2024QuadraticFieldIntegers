@@ -95,6 +95,13 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
       simp at proofabc r_def
       set p := 0 with p_def
       set q := - c / (b ^ 2) with q_def
+      have h_q : q ≠ 0 := by
+        intro hq
+        rw[hq] at q_def
+        rw[eq_comm, _root_.div_eq_zero_iff] at q_def
+        obtain (hc | hb) := q_def
+        · sorry
+        · sorry
       use p, q, s, r
       constructor
       · rw[p_def, q_def, r_def]
@@ -104,7 +111,7 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
         linear_combination ↑b * proofabc
       · constructor
         · exact h_rs
-        · sorry
+        · assumption
   · have h_roots : α = (-b + r) / (2 * a) ∨ α = (-b -r) / (2 * a) := by
       apply (quadratic_eq_zero_iff _ _ α).1
       · convert proofabc using 3
@@ -126,7 +133,9 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
         ring
       · constructor
         · assumption
-        · sorry
+        · rw[q_def]
+          simp
+          assumption
     case neg.inr hroot =>
       set p := -b / (2 * a) with p_def
       set q := 1/(2 * a) with q_def ---Achtung plus oder Minus
@@ -138,10 +147,13 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
         ring
       · constructor
         · assumption
-        · sorry
+        · rw[q_def]
+          simp
+          assumption
 
-#print axioms Ednawashere2
+
 #print axioms Ednawashere3
+#check 2 +2 =4
 
 
 /-
