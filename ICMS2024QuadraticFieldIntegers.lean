@@ -206,6 +206,7 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
   by_cases hk : (k : K) = 0
   · sorry
   refine ⟨d, ?_, d_sqfree⟩
+  have hd1 : d ≠ 1 := sorry
   refine φ.trans ?_
   subst α_eq
   have : ℚ⟮p + q * r⟯ = ℚ⟮r / k⟯ := by
