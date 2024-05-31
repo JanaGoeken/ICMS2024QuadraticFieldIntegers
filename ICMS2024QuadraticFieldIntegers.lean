@@ -194,14 +194,22 @@ open IntermediateField Polynomial
 
 attribute [-instance] algebraRat
 
+lemma not_mem_range_algebraMap_of_finrank {K : Type*} [Field K] [Algebra ℚ K] (α : K)
+    (h : 1 < FiniteDimensional.finrank ℚ (ℚ⟮α⟯ : Type _)) :
+    α ∉ (algebraMap ℚ K).range := by
+  sorry
+
 theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h : FiniteDimensional.finrank ℚ K = 2) :
     ∃ (d : ℤ) (φ : K ≃+* AdjoinRoot (X^2 - C (d : ℚ))), Squarefree d := by
   have : FiniteDimensional ℚ K := Module.finite_of_finrank_eq_succ h
   have : CharZero K := algebraRat.charZero K
   obtain ⟨α, φ, _⟩ := PrimitiveElementsOfDImTwo h
-  obtain ⟨p, q, s, r, α_eq, r_sq_eq_s⟩ := Ednawashere3 h α
-  by_cases hq : (q : K) = 0
-  · sorry
+  let φ' : K ≃ₗ[ℚ] ℚ⟮α⟯ := AlgEquiv.toLinearEquiv (AlgEquiv.ofRingEquiv (f := φ) (by simp))
+  obtain ⟨p, q, s, r, α_eq, r_sq_eq_s, hq0⟩ := by
+    refine Ednawashere3 h α (not_mem_range_algebraMap_of_finrank _ ?_)
+    rw [← φ'.finrank_eq, h]
+    norm_num
+  have hq : (q : K) ≠ 0 := by norm_cast
   obtain ⟨k, d, s_eq, d_sqfree⟩ := SquarefreePartFactorizationRat s
   by_cases hk : (k : K) = 0
   · sorry
@@ -260,7 +268,14 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
       rw [r_sq_eq_s, s_eq]
       push_cast
       exact sub_self _
-    · sorry
+    · intro q hq1 aeval_q
+      calc _
+        _ = ((2 : ℕ) : WithBot ℕ) := degree_X_pow_sub_C (by norm_num) _
+        _ = (minpoly ℚ (r / k)).degree := (MinpolyDegreeAtMostTwo _ ?_ h).symm
+        _ ≤ q.degree := minpoly.min ℚ _ hq1 aeval_q
+      refine (not_mem_range_algebraMap_of_finrank _ ?_)
+      rw [← this, ← φ'.finrank_eq, h]
+      norm_num
     · exact NoZeroSMulDivisors.algebraMap_injective (ℚ⟮r / k⟯) K
   refine (AdjoinRoot.equiv' (R := ℚ) _ pb ?_ ?_).symm.toRingEquiv
   · rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero, minpoly_pb]
