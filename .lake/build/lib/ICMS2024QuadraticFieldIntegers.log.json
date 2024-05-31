@@ -2,6 +2,17 @@
   ".> LEAN_PATH=.\\.\\.lake/packages\\batteries\\.lake\\build\\lib;.\\.\\.lake/packages\\Qq\\.lake\\build\\lib;.\\.\\.lake/packages\\aesop\\.lake\\build\\lib;.\\.\\.lake/packages\\proofwidgets\\.lake\\build\\lib;.\\.\\.lake/packages\\Cli\\.lake\\build\\lib;.\\.\\.lake/packages\\importGraph\\.lake\\build\\lib;.\\.\\.lake/packages\\mathlib\\.lake\\build\\lib;.\\.\\.lake\\build\\lib PATH c:\\Users\\frank\\.elan\\toolchains\\leanprover--lean4---v4.8.0-rc2\\bin\\lean.exe .\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean -R .\\.\\.\\. -o .\\.\\.lake\\build\\lib\\ICMS2024QuadraticFieldIntegers.olean -i .\\.\\.lake\\build\\lib\\ICMS2024QuadraticFieldIntegers.ilean -c .\\.\\.lake\\build\\ir\\ICMS2024QuadraticFieldIntegers.c --json",
   "level": "trace"},
  {"message":
-  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:1:13: function expected at\n  \"world\"\nterm has type\n  String",
-  "level": "error"},
- {"message": "Lean exited with code 1", "level": "error"}]
+  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:73:23: unused variable `hq`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:83:19: unused variable `hpodd`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:149:11: unused variable `b_nonzero`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:191:0: 'SquarefreePartFactorizationRat' depends on axioms: [propext, Classical.choice, Quot.sound]",
+  "level": "info"},
+ {"message":
+  ".\\.\\.\\.\\ICMS2024QuadraticFieldIntegers.lean:197:8: declaration uses 'sorry'",
+  "level": "warning"}]

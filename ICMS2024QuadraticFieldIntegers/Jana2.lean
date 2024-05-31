@@ -18,18 +18,12 @@ theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finran
   rw [hα]
   apply φ.toRingEquiv
 
-theorem MinpolyDegreeAtMostTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K) (h_2 : α ∉ (algebraMap ℚ K).range) (h : finrank ℚ K = 2)
-[FiniteDimensional ℚ K] : (minpoly ℚ α ).degree = 2 := by
-  convert le_antisymm (minpoly.degree_le α) _
+theorem MinpolyDegreeAtMostTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K) (h : finrank ℚ K = 2)
+[FiniteDimensional ℚ K] : (minpoly ℚ α ).degree ≤ 2 := by
+  convert minpoly.degree_le α
   · rw [h]
     norm_cast
   · assumption
-  · rw[h, degree_eq_natDegree]
-    norm_cast
-    rw[minpoly.two_le_natDegree_iff]
-    assumption
-    exact Algebra.IsIntegral.isIntegral α
-    exact minpoly.ne_zero_of_finite ℚ α
 
 @[norm_cast]
 lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
@@ -55,14 +49,13 @@ theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polyno
       omega
 
 
-theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2) (α : K) (h_2 : α ∉ (algebraMap ℚ K).range):
-  ∃  (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s ∧ q ≠ 0 := by
+theorem Ednawashere2 {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
+  ∃ (α : K) (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s := by
   have h_charzero: CharZero K := algebraRat.charZero K
+  choose α φ _ using PrimitiveElementsOfDImTwo h
   have h_finite : FiniteDimensional ℚ K := by exact Module.finite_of_finrank_eq_succ h
-  have h_deg : (minpoly ℚ α ).degree = 2 := by
-    apply MinpolyDegreeAtMostTwo α _ h
-    assumption
-  have minpoly_eq := Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two h_deg.le
+  have h_deg : (minpoly ℚ α ).degree ≤ 2 := by apply MinpolyDegreeAtMostTwo α h
+  have minpoly_eq := Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two h_deg
   set a := (minpoly ℚ α ).coeff 2
   set b := (minpoly ℚ α ).coeff 1
   set c := (minpoly ℚ α ).coeff 0
@@ -95,16 +88,14 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
       simp at proofabc r_def
       set p := 0 with p_def
       set q := - c / (b ^ 2) with q_def
-      use p, q, s, r
+      use α, p, q, s, r
       constructor
       · rw[p_def, q_def, r_def]
         push_cast
         simp only [zero_add]
         field_simp
         linear_combination ↑b * proofabc
-      · constructor
-        · exact h_rs
-        · sorry
+      · exact h_rs
   · have h_roots : α = (-b + r) / (2 * a) ∨ α = (-b -r) / (2 * a) := by
       apply (quadratic_eq_zero_iff _ _ α).1
       · convert proofabc using 3
@@ -118,33 +109,26 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
     case neg.inl hroot =>
       set p := -b / (2 * a) with p_def
       set q := 1/(2 * a) with q_def ---Achtung plus oder Minus
-      use p, q, s, r
+      use α, p, q, s, r
       constructor
       · rw[p_def, q_def, r_def]
         have : (a : K) ≠ 0 := by exact_mod_cast ha
         field_simp
         ring
-      · constructor
-        · assumption
-        · sorry
+      · assumption
     case neg.inr hroot =>
       set p := -b / (2 * a) with p_def
       set q := 1/(2 * a) with q_def ---Achtung plus oder Minus
-      use p, q, s, r
+      use α, p, q, s, r
       constructor
       · rw[p_def, q_def, r_def]
         have : (a : K) ≠ 0 := by exact_mod_cast ha
         field_simp
         ring
-      · constructor
-        · assumption
-        · sorry
+      · assumption
 
 #print axioms Ednawashere2
-#print axioms Ednawashere3
 
 
-/-
 theorem isombetweenthethinkswewanthehe {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
   ∃ (α : K) (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s := by
--/
