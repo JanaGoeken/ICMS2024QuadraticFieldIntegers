@@ -252,7 +252,7 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
     · intro q hq1 aeval_q
       calc _
         _ = ((2 : ℕ) : WithBot ℕ) := degree_X_pow_sub_C (by norm_num) _
-        _ = (minpoly ℚ (r / k)).degree := (MinpolyDegreeAtMostTwo _ ?_ h).symm
+        _ = (minpoly ℚ (r / k)).degree := (MinpolyDegreeIsTwo _ ?_ h).symm
         _ ≤ q.degree := minpoly.min ℚ _ hq1 aeval_q
       refine (not_mem_range_algebraMap_of_finrank _ ?_)
       rw [← this, ← φ'.finrank_eq, h]

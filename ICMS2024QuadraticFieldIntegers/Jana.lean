@@ -9,7 +9,7 @@ import Mathlib.Algebra.Polynomial.Degree.Definitions
 open FiniteDimensional Polynomial IntermediateField
 
 theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
-    ∃ (α : K),  ∃ φ: K ≃+* ℚ⟮α⟯, true := by
+    ∃ (α : K),  ∃ _: K ≃+* ℚ⟮α⟯, true := by
   have : FiniteDimensional ℚ K := by exact Module.finite_of_finrank_eq_succ h
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ K
   use α
@@ -18,8 +18,9 @@ theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finran
   rw [hα]
   apply φ.toRingEquiv
 
-theorem MinpolyDegreeAtMostTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K) (h_2 : α ∉ (algebraMap ℚ K).range) (h : finrank ℚ K = 2)
-[FiniteDimensional ℚ K] : (minpoly ℚ α ).degree = 2 := by
+theorem MinpolyDegreeIsTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K)
+    (h_2 : α ∉ (algebraMap ℚ K).range) (h : finrank ℚ K = 2) [FiniteDimensional ℚ K] :
+    (minpoly ℚ α ).degree = 2 := by
   convert le_antisymm (minpoly.degree_le α) _
   · rw [h]
     norm_cast
@@ -60,7 +61,7 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
   have h_charzero: CharZero K := algebraRat.charZero K
   have h_finite : FiniteDimensional ℚ K := by exact Module.finite_of_finrank_eq_succ h
   have h_deg : (minpoly ℚ α ).degree = 2 := by
-    apply MinpolyDegreeAtMostTwo α _ h
+    apply MinpolyDegreeIsTwo α _ h
     assumption
   have minpoly_eq := Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two h_deg.le
   set a := (minpoly ℚ α ).coeff 2
@@ -156,10 +157,3 @@ theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2)
 
 
 #print axioms Ednawashere3
-#check 2 +2 =4
-
-
-/-
-theorem isombetweenthethinkswewanthehe {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
-  ∃ (α : K) (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s := by
--/
