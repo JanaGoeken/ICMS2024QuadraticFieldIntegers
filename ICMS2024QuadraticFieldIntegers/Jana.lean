@@ -56,20 +56,20 @@ theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polyno
       omega
 
 
-theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2) (α : K) (h_2 : α ∉ (algebraMap ℚ K).range):
-  ∃  (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s ∧ q ≠ 0 := by
-  have h_charzero: CharZero K := algebraRat.charZero K
-  have h_finite : FiniteDimensional ℚ K := by exact Module.finite_of_finrank_eq_succ h
-  have h_deg : (minpoly ℚ α ).degree = 2 := by
+theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2) (α : K)
+    (h_2 : α ∉ (algebraMap ℚ K).range): ∃  (p q s : ℚ)
+    (r : K), α = p + q * r ∧ r^2 = s ∧ q ≠ 0 := by
+  let h_charzero: CharZero K := algebraRat.charZero K
+  let h_finite : FiniteDimensional ℚ K := Module.finite_of_finrank_eq_succ h
+  let h_deg : (minpoly ℚ α ).degree = 2 := by
     apply MinpolyDegreeIsTwo α _ h
     assumption
-  have minpoly_eq := Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two h_deg.le
+  let minpoly_eq := Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two h_deg.le
   set a := (minpoly ℚ α ).coeff 2
   set b := (minpoly ℚ α ).coeff 1
   set c := (minpoly ℚ α ).coeff 0
   have proofabc : a * α ^ 2 + b * α + c = 0 := by
-    rw[← minpoly.aeval (A := ℚ) (x := α)]
-    rw[minpoly_eq]
+    rw[← minpoly.aeval (A := ℚ) (x := α), minpoly_eq]
     simp only [map_add, map_mul, aeval_C, eq_ratCast, map_pow, aeval_X]
   set s := discrim a b c with s_def
   have hdiscrim : discrim ↑a ↑b ↑c = (2 * ↑a * α + ↑b) ^ 2 := by
