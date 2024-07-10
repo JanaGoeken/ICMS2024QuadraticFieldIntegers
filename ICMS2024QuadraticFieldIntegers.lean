@@ -1,6 +1,7 @@
--- import Mathlib
 import ICMS2024QuadraticFieldIntegers.Jana
 
+--  Theorem which shows that you can devide any natural number in a square times a squarefree component.
+-- further down done for Q
 theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n = k^2*l ∧ Squarefree l := by
   by_cases h : n = 0
   · use 0,2
@@ -13,7 +14,6 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
     let odd_mult_factors := Multiset.filter (fun (p : ℕ) => Odd (Multiset.count p factors)) distinct_factors
     let even_part_factors := factors - odd_mult_factors
     let squarefree_part := Multiset.prod odd_mult_factors
-
     have exponents_even : (∀ (p : ℕ), (Even (Multiset.count p even_part_factors))) := by
       intro p
       rw [Multiset.count_sub]
@@ -43,7 +43,6 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
           rw [Multiset.count_eq_zero_of_not_mem hp]
           exact even_zero
         · exact hp
-
         contrapose! hp
         rw [Multiset.mem_filter]
         constructor
@@ -53,12 +52,9 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
           rw [Multiset.count_eq_zero_of_not_mem hp]
           exact even_zero
         · exact hp
-
     -- Union over p in distinct_primes of Multiset.replicate (Multiset.count p even_part_factors)/2 p
     let half_multiset : Multiset ℕ := Multiset.bind distinct_factors (fun p => Multiset.replicate ((Multiset.count p even_part_factors)/2) p)
-
     let sq_part := half_multiset.prod
-
     use sq_part, squarefree_part
     constructor
     · have double_lemma : half_multiset + half_multiset = even_part_factors := by
@@ -87,12 +83,10 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
           · rw [f_def]
             simp
             exact Nat.div_two_mul_two_of_even (exponents_even p)
-
         · rw [if_neg hp0]
           rw [Multiset.count_sub,Multiset.count_eq_zero_of_not_mem]
           simp
           exact hp0
-
       have full_multiset_lemma : even_part_factors + odd_mult_factors = factors := by
         have sub_inter : factors ∩ odd_mult_factors = odd_mult_factors := by
           rw [← Multiset.inf_eq_inter]
@@ -100,7 +94,6 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
           exact le_trans (Multiset.filter_le (fun p => Odd (Multiset.count p factors)) distinct_factors) (Multiset.dedup_le factors)
         rw [← sub_inter]
         apply Multiset.sub_add_inter
-
       rw [pow_two]
       rw [← Multiset.prod_add]
       rw [← Multiset.prod_add]
@@ -109,7 +102,6 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
       rw [← associated_iff_eq]
       apply Associated.symm
       exact UniqueFactorizationMonoid.normalizedFactors_prod h
-
     · have sqfree_nonzero : squarefree_part ≠ 0 := by
         intro h0
         rw [Multiset.prod_eq_zero_iff] at h0
@@ -121,7 +113,6 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
           exact UniqueFactorizationMonoid.normalizedFactors_prod h
         rw [fact_prod] at h0
         exact h h0
-
       rw [UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors]
       rw [UniqueFactorizationMonoid.normalizedFactors_prod_of_prime]
       apply Multiset.Nodup.filter
@@ -131,6 +122,7 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
         rw [Multiset.mem_dedup] at hp
         exact UniqueFactorizationMonoid.prime_of_normalized_factor p hp
       · exact sqfree_nonzero
+  done
 
 theorem SquarefreePartFactorizationRat (q : ℚ) : ∃ k : ℚ, ∃ l : ℤ, q = k^2*l ∧ Squarefree l := by
   by_cases hq : q = 0

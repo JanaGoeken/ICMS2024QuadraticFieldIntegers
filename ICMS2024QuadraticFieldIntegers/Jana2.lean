@@ -130,5 +130,5 @@ theorem Ednawashere2 {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) 
 #print axioms Ednawashere2
 
 
-theorem isombetweenthethinkswewanthehe {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
-  ∃ (α : K) (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s := by
+--theorem isombetweenthethinkswewanthehe {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
+  --∃ (α : K) (p q s : ℚ) (r : K), α = p + q * r ∧ r^2 = s := by

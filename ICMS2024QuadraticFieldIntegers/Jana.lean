@@ -7,7 +7,7 @@ import Mathlib.Algebra.Polynomial.Degree.Definitions
 
 
 open FiniteDimensional Polynomial IntermediateField
-
+--Theorem which states that every rational fieldextension of rank 2 is isomorphic to Q adjoint squareroot 2.
 theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
     ∃ (α : K),  ∃ _: K ≃+* ℚ⟮α⟯, true := by
   have : FiniteDimensional ℚ K := by exact Module.finite_of_finrank_eq_succ h
@@ -18,6 +18,8 @@ theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finran
   rw [hα]
   apply φ.toRingEquiv
 
+--Theorem which states that for an extension field K of Q of rank 2, for an α in K, not in Q, the minimal polynomial
+--for which α is a root is of degree 2.
 theorem MinpolyDegreeIsTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K)
     (h_2 : α ∉ (algebraMap ℚ K).range) (h : finrank ℚ K = 2) [FiniteDimensional ℚ K] :
     (minpoly ℚ α ).degree = 2 := by
@@ -32,6 +34,7 @@ theorem MinpolyDegreeIsTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K)
     exact Algebra.IsIntegral.isIntegral α
     exact minpoly.ne_zero_of_finite ℚ α
 
+--A normcast lemma
 @[norm_cast]
 lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
     ↑(discrim a b c) = discrim (a: K) (b : K) (c : K) := by
@@ -39,6 +42,7 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
   unfold discrim
   norm_cast
 
+--general form of a polynomial of degree at most two
 theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polynomial R}
   (h : p.degree ≤ 2) :
   p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
@@ -55,7 +59,8 @@ theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polyno
     · simp_all [degree_eq_natDegree]
       omega
 
-
+--Final theorem, showing that every element of the extension field K can be written in the form p+q*r where p,q are rationals
+-- and r is squareroot of some squarefree natural number.
 theorem Ednawashere3 {K : Type*}[Field K][Algebra ℚ K] (h : finrank ℚ K = 2) (α : K)
     (h_2 : α ∉ (algebraMap ℚ K).range): ∃  (p q s : ℚ)
     (r : K), α = p + q * r ∧ r^2 = s ∧ q ≠ 0 := by
