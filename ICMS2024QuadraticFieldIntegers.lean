@@ -17,9 +17,10 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
     have exponents_even : (∀ (p : ℕ), (Even (Multiset.count p even_part_factors))) := by
       intro p
       rw [Multiset.count_sub]
-      by_cases hp : p ∈ odd_mult_factors
+      by_cases hp : p ∈ odd_mult_factors -- Anne: another way to do this is `rw [Multiset.count_filter]; split_ifs with hp` (and the same for `Multiset.count_dedup`)
       · rw [Multiset.count_filter_of_pos]
         · rw [Multiset.count_dedup]
+          -- Anne: you can group together `rw`s like `rw [Multiset.mem_filter, Multiset.mem_dedup] at hp`
           rw [Multiset.mem_filter] at hp
           rw [Multiset.mem_dedup] at hp
           rw [if_pos]
@@ -53,6 +54,9 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
           exact even_zero
         · exact hp
     -- Union over p in distinct_primes of Multiset.replicate (Multiset.count p even_part_factors)/2 p
+    -- Anne: I would extract this as a definition called something like `Multiset.halveCount`
+    -- And then a lot of these `have`s like `double_lemma` could be their own lemma.
+    -- (Perhaps we should then define the squarefree part as `factors - (half_multiset + half_multiset).)
     let half_multiset : Multiset ℕ := Multiset.bind distinct_factors (fun p => Multiset.replicate ((Multiset.count p even_part_factors)/2) p)
     let sq_part := half_multiset.prod
     use sq_part, squarefree_part
@@ -76,6 +80,7 @@ theorem SquarefreePartFactorizationNat (n : ℕ) : ∃ k : ℕ, ∃ l : ℕ, n =
         by_cases hp0 : p ∈ factors
         · rw [if_pos hp0]
           simp
+          -- Anne: this case distinction seems to be unused.
           by_cases hpodd : p ∈ odd_mult_factors
           · rw [f_def]
             simp
@@ -149,7 +154,7 @@ theorem SquarefreePartFactorizationRat (q : ℚ) : ∃ k : ℚ, ∃ l : ℤ, q =
     rw [q_frac]
     field_simp
     let h_fact := h_nat.1
-    by_cases h_sign : a > 0
+    by_cases h_sign : a > 0 -- Anne: probably we can deal with the cases simultaneously by using `Int.sign a * l_nat` for the witness for `l`
     · use l_nat
       constructor
       · have q_pos : 0 ≤ q_int := by positivity
@@ -198,7 +203,7 @@ theorem isombetweenthethinkswewanthehe {K : Type*} [Field K] [Algebra ℚ K] (h 
     ∃ (d : ℤ) (_φ : K ≃+* AdjoinRoot (X^2 - C (d : ℚ))), Squarefree d := by
   have : FiniteDimensional ℚ K := Module.finite_of_finrank_eq_succ h
   have : CharZero K := algebraRat.charZero K
-  obtain ⟨α, φ, _⟩ := PrimitiveElementsOfDImTwo h
+  obtain ⟨α, ⟨φ⟩⟩ := PrimitiveElementsOfDimTwo h
   let φ' : K ≃ₗ[ℚ] ℚ⟮α⟯ := AlgEquiv.toLinearEquiv (AlgEquiv.ofRingEquiv (f := φ) (by simp))
   have hα : α ∉ (algebraMap ℚ K).range := by
     refine (not_mem_range_algebraMap_of_finrank _ ?_)

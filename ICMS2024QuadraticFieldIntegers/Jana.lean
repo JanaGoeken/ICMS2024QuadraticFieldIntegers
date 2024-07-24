@@ -8,14 +8,15 @@ import Mathlib.Algebra.Polynomial.Degree.Definitions
 
 open FiniteDimensional Polynomial IntermediateField
 --Theorem which states that every rational fieldextension of rank 2 is isomorphic to Q adjoint squareroot 2.
-theorem PrimitiveElementsOfDImTwo {K : Type*}[Field K][Algebra ℚ K](h : finrank ℚ K = 2) :
-    ∃ (α : K),  ∃ _: K ≃+* ℚ⟮α⟯, true := by
+theorem PrimitiveElementsOfDimTwo {K : Type*}[Field K][Algebra ℚ K] -- Anne: we could replace this with any extension `K / L` which is separable
+    (h : finrank ℚ K = 2) : -- Anne: this can become `0 < finrank ℚ K`
+    ∃ (α : K),  ∃ _: K ≃+* ℚ⟮α⟯, true := by -- Anne: More commonly phrased as: `∃ α, Nonempty (K ≃+* ℚ⟮α⟯)`, and maybe replace the ring equiv with an algebra equiv.
   have : FiniteDimensional ℚ K := by exact Module.finite_of_finrank_eq_succ h
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ K
   use α
   refine ⟨?_, rfl⟩
   let φ := (IntermediateField.topEquiv (F := ℚ) (E := K)).symm
-  rw [hα]
+  rw [hα] -- Anne: Nicer to use `IntermediateField.equivOfEq`.
   apply φ.toRingEquiv
 
 --Theorem which states that for an extension field K of Q of rank 2, for an α in K, not in Q, the minimal polynomial
@@ -35,6 +36,7 @@ theorem MinpolyDegreeIsTwo {K : Type u_3} [Field K] [Algebra ℚ K] (α : K)
     exact minpoly.ne_zero_of_finite ℚ α
 
 --A normcast lemma
+-- Anne: generalize to any field extension (of characteristic 0?)
 @[norm_cast]
 lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
     ↑(discrim a b c) = discrim (a: K) (b : K) (c : K) := by
@@ -43,9 +45,23 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
   norm_cast
 
 --general form of a polynomial of degree at most two
+-- Anne: Maybe we should have some induction principle here?
+-- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
+-- then this can be three applications of that principle plus some rewriting.
+theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] (p : Polynomial R) {n : ℕ}
+    (h : p.degree ≤ n) :
+    ∃ q, q.degree < (n : WithBot ℕ) ∧ p = C (p.coeff n) * X ^ n + q := by
+  refine ⟨p.erase n, ?_, ?_⟩
+  · sorry
+  · sorry
+
+--general form of a polynomial of degree at most two
+-- Anne: Maybe we should have some induction principle here?
+-- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
+-- then this can be three applications of that principle plus some rewriting.
 theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polynomial R}
-  (h : p.degree ≤ 2) :
-  p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
+    (h : p.degree ≤ 2) :
+    p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
   ext i
   match i with
   | 0
@@ -58,6 +74,17 @@ theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polyno
     · simp_all
     · simp_all [degree_eq_natDegree]
       omega
+
+-- Replacement for `Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two'`
+theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two' [Semiring R] {p : Polynomial R}
+    (h : p.degree ≤ 2) :
+    p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
+  obtain ⟨q, hdegq, p_eq⟩ := exists_eq_X_sq_add_X_add_C_of_degree_le_two p h
+  obtain ⟨r, hdegr, q_eq⟩ := exists_eq_X_sq_add_X_add_C_of_degree_le_two q (show q.degree ≤ 1 by sorry)
+  have r_eq : r = C (p.coeff 0) := by sorry
+  rw [p_eq, q_eq, r_eq]
+  simp
+  sorry
 
 --Final theorem, showing that every element of the extension field K can be written in the form p+q*r where p,q are rationals
 -- and r is squareroot of some squarefree natural number.
