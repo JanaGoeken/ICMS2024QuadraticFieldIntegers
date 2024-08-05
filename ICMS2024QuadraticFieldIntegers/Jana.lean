@@ -44,16 +44,41 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
   unfold discrim
   norm_cast
 
+
+--this theorem I couldn't find but I would bet it exists...
+theorem lt_iff_le_and_lt {α : Type u} [Preorder α] {a : α} {b : α} {c : α}:
+  a < b ↔ c ≤ b ∧ a < c := by sorry
+
+
 --general form of a polynomial of degree at most two
 -- Anne: Maybe we should have some induction principle here?
 -- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
 -- then this can be three applications of that principle plus some rewriting.
-theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] (p : Polynomial R) {n : ℕ}
+ theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 [Semiring R] (p : Polynomial R) {n : ℕ}
     (h : p.degree ≤ n) :
-    ∃ q, q.degree < (n : WithBot ℕ) ∧ p = C (p.coeff n) * X ^ n + q := by
-  refine ⟨p.erase n, ?_, ?_⟩
-  · sorry
-  · sorry
+     ∃ q, q.degree < (n : WithBot ℕ) ∧ p = C (p.coeff n) * X ^ n + q := by
+     by_cases hp : p=0
+     · rw[hp]
+       use 0
+       simp only [degree_zero, coeff_zero, map_zero, zero_mul, add_zero, and_true]
+       exact Batteries.compareOfLessAndEq_eq_lt.mp rfl
+     · by_cases hn : n = p.degree
+       · refine ⟨p.erase n, ?_, ?_⟩
+         · sorry -- degree_erase_lt
+         · sorry -- monomial_add_erase
+       · have h1 : p.degree < n := by
+           rw[lt_iff_not_le, le_iff_lt_or_eq]
+           simp only [not_or, not_lt]
+           aesop
+         have h2 : p.coeff n = 0 := by
+           apply coeff_eq_zero_of_degree_lt
+           exact h1
+         use p
+         rw[h2]
+         simp
+         exact h1
+     done
+
 
 --general form of a polynomial of degree at most two
 -- Anne: Maybe we should have some induction principle here?
