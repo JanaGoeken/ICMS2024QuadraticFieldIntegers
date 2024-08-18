@@ -45,11 +45,6 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
   norm_cast
 
 
---this theorem I couldn't find but I would bet it exists...
-theorem lt_iff_le_and_lt {α : Type u} [Preorder α] {a : α} {b : α} {c : α}:
-  a < b ↔ c ≤ b ∧ a < c := by sorry
-
-
 --general form of a polynomial of degree at most two
 -- Anne: Maybe we should have some induction principle here?
 -- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
@@ -58,41 +53,51 @@ theorem lt_iff_le_and_lt {α : Type u} [Preorder α] {a : α} {b : α} {c : α}:
     {n : ℕ} (h : p.degree ≤ n) :
      ∃ q, q.degree < (n : WithBot ℕ) ∧ p = C (p.coeff n) * X ^ n + q := by
      by_cases hp : p=0
-     · rw[hp]
+     · rw[hp]                               --case p=0
        use 0
        simp only [degree_zero, coeff_zero, map_zero, zero_mul, add_zero, and_true]
        exact Batteries.compareOfLessAndEq_eq_lt.mp rfl
-     · by_cases hn : n = p.degree
+     · by_cases hn : n = p.natDegree
        · refine ⟨p.erase n, ?_, ?_⟩           -- case p ≠ 0, n = p.degree
-         · apply lt_of_eq_of_lt' (a := (erase n p).degree) (b := p.degree ) (c := ↑n)
-           · exact Eq.symm hn
-           · have hnatn : n = natDegree p := by                 --,
-              rw [natDegree_eq_of_degree_eq_some (Eq.symm hn)]  --| how do I make this shorter?
-             rw[hnatn]                                          --'
-             exact degree_erase_lt hp
-         · have lol : C (p.coeff n) * X ^ n = (monomial n) (p.coeff n) := by
-             rw[ Polynomial.X_pow_eq_monomial]
-             simp only [C_mul_monomial, mul_one]
-           rw [lol]
+         · rw [hn, ←Polynomial.degree_eq_natDegree]
+           apply degree_erase_lt hp
+           exact hp
+         · rw [Polynomial.X_pow_eq_monomial]
+           simp only [C_mul_monomial, mul_one]
            apply Eq.symm (monomial_add_erase p n)
-       · have h1 : p.degree < n := by         --here: is it posible to change h to p.degree < n instead?
+       · rw [← @Ne.eq_def, @ne_comm] at hn
+         have hnlt : p.degree < ↑n := by
            rw [lt_iff_le_and_ne]
-           rw [← @Ne.eq_def, @ne_comm] at hn
-           refine ⟨h, hn⟩
-         have h2 : p.coeff n = 0 := by
-           apply coeff_eq_zero_of_degree_lt
-           exact h1
-         use p
-         rw[h2]
-         simp
-         exact h1
-     done
+           refine ⟨h, ?_ ⟩
+           apply degree_ne_of_natDegree_ne hn
+         refine ⟨ p, hnlt, ?_ ⟩                -- case p ≠ 0, n = p.degree
+         · have hcoeff : p.coeff n = 0 := by
+             apply coeff_eq_zero_of_degree_lt
+             exact hnlt
+           rw [hcoeff]
+           simp only [map_zero, zero_mul, zero_add]
 
 
---general form of a polynomial of degree at most two
--- Anne: Maybe we should have some induction principle here?
--- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
--- then this can be three applications of that principle plus some rewriting.
+
+--------------------------------------------test---------------------------------------------------------
+
+---alternative theorem:
+ --Pros:
+ ------more information about the decomposition
+ ------more fitting with the library
+ ------shorter proof
+ --Cons:
+ ------does not cover the cases when p is constant, especially 0
+ ------less flexible in the choice of n and q
+ theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2_suggestion_1 [Semiring R] (p : Polynomial R)
+     ( f0 : 2 ≤ Finset.card (Polynomial.support p)):
+     ∃ q, q.natDegree < p.natDegree ∧  p = monomial p.natDegree p.leadingCoeff + q := by
+     refine ⟨ p.eraseLead, ?_, ?_ ⟩
+     · apply eraseLead_natDegree_lt f0
+     · rw[add_comm]
+       apply Eq.symm (eraseLead_add_monomial_natDegree_leadingCoeff p)
+-------------------------------------------------test end ------------------------------------------------------------
+
 theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polynomial R}
     (h : p.degree ≤ 2) :
     p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
