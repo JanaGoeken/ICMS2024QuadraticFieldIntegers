@@ -45,6 +45,17 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
   norm_cast
 
 
+/--theorem eraseLead_natDegree_lt [Semiring R] (f : Polynomial R) (f0 : 1 < f.natDegree) :
+(eraseLead f).natDegree < f.natDegree :=
+lt_of_le_of_ne eraseLead_natDegree_le_aux <| sorry
+
+start with:
+theorem eraseLead_degree_lt [Semiring R] (f : Polynomial R) (f0 : f ≠ 0) :
+(eraseLead f).degree < f.degree :=
+sorry
+
+there also is theorem Polynomial.eq_X_add_C_of_degree_le_one, I should use that-/
+
 --general form of a polynomial of degree at most two
 -- Anne: Maybe we should have some induction principle here?
 -- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
@@ -78,7 +89,49 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
            simp only [map_zero, zero_mul, zero_add]
 
 
-
+ theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2advanced [Semiring R] (p : Polynomial R)
+    {n : ℕ} (h : p.degree ≤ n) :
+     ∃ q, q.degree < (n : WithBot ℕ) ∧ p = C (p.coeff n) * X ^ n + q ∧ p.coeff (n - 1) = q.coeff (n - 1):= by
+     by_cases hp : p=0
+     · rw[hp]                               --case p=0
+       use 0
+       simp only [degree_zero, coeff_zero, map_zero, zero_mul, add_zero, and_true]
+       exact Batteries.compareOfLessAndEq_eq_lt.mp rfl
+     · by_cases hn : n = p.natDegree
+       · refine ⟨p.erase n, ?_, ?_⟩           -- case p ≠ 0, n = p.degree
+         · rw [hn, ←Polynomial.degree_eq_natDegree]
+           apply degree_erase_lt hp
+           exact hp
+         · have heq : p = C (p.coeff n) * X ^ n + erase n p := by
+             rw [Polynomial.X_pow_eq_monomial]
+             simp only [C_mul_monomial, mul_one]
+             apply Eq.symm (monomial_add_erase p n)
+           constructor
+           · apply heq
+           · rw[hn]
+             nth_rewrite 1 [←monomial_add_erase p n]
+             rw[hn]
+             have lslsl : ((monomial p.natDegree) (p.coeff p.natDegree)).coeff (p.natDegree - 1) = 0 := by
+               --rw [←coeff_zero (n := p.natDegree - 1)]
+               rw [@coeff_monomial]
+               rw [←hn]
+               sorry
+               have noShitSherlock : (n = n - 1) = false := by sorry
+             rw[coeff_add, lslsl, zero_add]
+       · rw [← @Ne.eq_def, @ne_comm] at hn
+         have hnlt : p.degree < ↑n := by
+           rw [lt_iff_le_and_ne]
+           refine ⟨h, ?_ ⟩
+           apply degree_ne_of_natDegree_ne hn
+         refine ⟨ p, hnlt, ?_ ⟩                -- case p ≠ 0, n = p.degree
+         · have hcoeff : p.coeff n = 0 := by
+             apply coeff_eq_zero_of_degree_lt
+             exact hnlt
+           constructor
+           · rw [hcoeff]
+             simp only [map_zero, zero_mul, zero_add]
+           · rfl
+     done
 --------------------------------------------test---------------------------------------------------------
 
 ---alternative theorem:
@@ -87,7 +140,7 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
  ------more fitting with the library
  ------shorter proof
  --Cons:
- ------does not cover the cases when p is constant, especially 0
+ ------not compatible for our project since it does not cover the cases when p is constant, especially 0
  ------less flexible in the choice of n and q
  theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2_suggestion_1 [Semiring R] (p : Polynomial R)
      ( f0 : 2 ≤ Finset.card (Polynomial.support p)):
@@ -118,12 +171,28 @@ theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two [Semiring R] {p : Polyno
 theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two' [Semiring R] {p : Polynomial R}
     (h : p.degree ≤ 2) :
     p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
-  obtain ⟨q, hdegq, p_eq⟩ := exists_eq_X_sq_add_X_add_C_of_degree_le_two p h
-  obtain ⟨r, hdegr, q_eq⟩ := exists_eq_X_sq_add_X_add_C_of_degree_le_two q (show q.degree ≤ 1 by sorry)
-  have r_eq : r = C (p.coeff 0) := by sorry
-  rw [p_eq, q_eq, r_eq]
+  obtain ⟨q, hdegq, p_eq ⟩ := Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 p (n:=2) h
+  obtain ⟨r, hdegr, q_eq⟩ := Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 q (n:=1) (SuccOrder.le_of_lt_succ hdegq)
+  obtain ⟨lezero, hzero, r_eq⟩ := Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 r (n:=0) (SuccOrder.le_of_lt_succ hdegr)
+  rw [lt_iff_not_le] at hzero
+  norm_cast at hzero
+  rw [zero_le_degree_iff, not_not] at hzero
+  nth_rewrite 1 [p_eq, q_eq, r_eq, hzero]
   simp
-  sorry
+  rw[add_assoc]
+
+  theorem Polynomial.eq_X_sq_add_X_add_C_of_degree_le_two'h [Semiring R] {p : Polynomial R}
+    (h : p.degree ≤ 2) :
+    p = C (p.coeff 2) * X^2 + C (p.coeff 1) * X + C (p.coeff 0) := by
+  obtain ⟨q, hdegq, p_eq ⟩ := Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 p (n:=2) h
+  obtain ⟨r, hdegr, q_eq⟩ := Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 q (n:=1) (SuccOrder.le_of_lt_succ hdegq)
+  have q_coeff : q.coeff 1 = p.coeff 1 := by sorry
+  have r_coeff : r = C (p.coeff 0) := by sorry
+  nth_rewrite 1 [p_eq, q_eq, q_coeff, r_coeff]
+  simp
+  rw[add_assoc]
+
+
 
 --Final theorem, showing that every element of the extension field K can be written in the form p+q*r where p,q are rationals
 -- and r is squareroot of some squarefree natural number.
