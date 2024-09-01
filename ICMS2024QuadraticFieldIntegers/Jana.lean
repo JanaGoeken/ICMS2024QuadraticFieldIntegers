@@ -45,21 +45,76 @@ lemma discrim_coe {K : Type u_3} [Field K] [Algebra ℚ K] (a b c : ℚ) :
   norm_cast
 
 
-/--theorem eraseLead_natDegree_lt [Semiring R] (f : Polynomial R) (f0 : 1 < f.natDegree) :
-(eraseLead f).natDegree < f.natDegree :=
-lt_of_le_of_ne eraseLead_natDegree_le_aux <| sorry
 
-start with:
-theorem eraseLead_degree_lt [Semiring R] (f : Polynomial R) (f0 : f ≠ 0) :
-(eraseLead f).degree < f.degree :=
-sorry
 
-there also is theorem Polynomial.eq_X_add_C_of_degree_le_one, I should use that-/
+/-- trying to prove the "new eraseLead_natDegree_lt - theorem"-/
+
+
+/--new Lemma-/
+
+theorem natDegree_eraseLead_eq_iff_natDegree_zero [Semiring R] (f : Polynomial R) (f0 : 1 < f.natDegree) :
+  (f.eraseLead.natDegree = f.natDegree) ↔ (f.natDegree = 0) := by
+  constructor
+  · intro h1
+    by_contra h2
+    have h3 : natDegree (eraseLead f) ≤ natDegree f - 1 := by
+       apply Polynomial.eraseLead_natDegree_le f
+    rw[h1] at h3
+    have h4 : f.natDegree - 1  < ( f.natDegree : ℤ ) := by
+       apply sub_one_lt f.natDegree (α := ℤ)
+    have h5 : f.natDegree < f.natDegree := by
+       apply LE.le.trans_lt (a := f.natDegree) (b:= f.natDegree - 1) (c := f.natDegree)
+       · exact h3
+       · exact Nat.sub_one_lt_of_lt f0
+    simp only [lt_self_iff_false] at h5
+  · intro h1
+    apply Eq.le at h1
+    have h2 : f = Polynomial.C (Polynomial.coeff f 0) := by
+      apply eq_C_of_natDegree_le_zero h1
+    have h3 : natDegree (Polynomial.C (f.coeff 0)) = 0 := by
+      apply natDegree_C (f.coeff 0)
+    rw[h2, eraseLead_C (f.coeff 0), natDegree_C (f.coeff 0), natDegree_zero]
+
+
+theorem eraseLead_natDegree_lt [Semiring R] (f : Polynomial R) (f0 : 1 < f.natDegree) :
+(eraseLead f).natDegree < f.natDegree := lt_of_le_of_ne eraseLead_natDegree_le_aux <| by
+rename_i inst
+simp_all only [eraseLead_add_monomial_natDegree_leadingCoeff, ne_eq]
+apply Aesop.BuiltinRules.not_intro
+intro a
+have b : eraseLead f + (monomial (natDegree f)) (leadingCoeff f) = f := by
+    apply eraseLead_add_monomial_natDegree_leadingCoeff f
+have d :(f.eraseLead.natDegree = f.natDegree) ↔ (f.natDegree = 0) := by
+   apply natDegree_eraseLead_eq_iff_natDegree_zero f f0
+have hf : f ≠ 0 := by
+  simp_all only [monomial_zero_left, iff_true, ne_eq, not_lt_zero']
+rw [d] at a
+rw [a] at f0
+simp only [not_lt_zero'] at f0
+done
+
+
+
+
+/--Did it, but the proof is long and ugly.
+-> the problem of solving "f.eraseLead ≠ 0" boils down to using the theorem "eraseLead_ne_zero",
+which uses the assumption "(f0 : 2 ≤ Finset.card (Polynomial.support f))". So I guess I could try to
+alter that theorem, too-/
+
+theorem Polynomial.amount_support_le_degree_add_one {R : Type u_1} [Semiring R] {f : Polynomial R} :
+  Finset.card (support f) ≤ f.degree + 1 := by sorry
+
+
+
+/--there also is theorem Polynomial.eq_X_add_C_of_degree_le_one, I should use that-/
+
+
 
 --general form of a polynomial of degree at most two
 -- Anne: Maybe we should have some induction principle here?
 -- Of the form `p.degree ≤ n -> ∃ q, q.degree < n ∧ p = C (p.coeff n) * X ^ n + q`
 -- then this can be three applications of that principle plus some rewriting.
+
  theorem Polynomial.exists_eq_X_sq_add_X_add_C_of_degree_le_two_2 [Semiring R] (p : Polynomial R)
     {n : ℕ} (h : p.degree ≤ n) :
      ∃ q, q.degree < (n : WithBot ℕ) ∧ p = C (p.coeff n) * X ^ n + q := by
